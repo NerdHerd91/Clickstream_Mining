@@ -22,7 +22,7 @@ public class Clickstream {
 			sc.close();
 
 			buildDataMaps(trainFeat, "./DataSet/trainfeat.csv", "./DataSet/trainlabs.csv");
-//			buildDataMaps(testFeat, "./DataSet/testfeat.csv", "./DataSet/testlabs.csv");
+			buildDataMaps(testFeat, "./DataSet/testfeat.csv", "./DataSet/testlabs.csv");
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -34,7 +34,6 @@ public class Clickstream {
 			Scanner labs = new Scanner(new File(labPath));
 
 			while(labs.hasNextInt() && data.hasNextLine()) {
-				System.out.println("Reading a user line");
 				int label = labs.nextInt();
 				String dataLine = data.nextLine();
 				Scanner sc = new Scanner(dataLine);
@@ -53,7 +52,6 @@ public class Clickstream {
 				PageView pv = new PageView(label, features);
 				dataMap.get(label).add(pv);
 				sc.close();
-				System.out.println("Finished a user example");
 			}
 			data.close();
 			labs.close();
