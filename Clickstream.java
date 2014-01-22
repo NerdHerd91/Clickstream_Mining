@@ -6,9 +6,10 @@ public class Clickstream {
 	public static final int FEATURES = 274;
 
 	public static void main(String[] args) {
-		// Set of String Feature Names.
-		Set<String> featNames = new LinkedHashSet<String>();
-		
+		// Array of String Feature Names.
+		//Set<String> featNames = new LinkedHashSet<String>();
+		String[] featNames = new String[FEATURES];
+
 		// Set of PageView objects for each feature set.
 		// Contains class value and array of feature values.
 		Set<PageView> trainFeat = new HashSet<PageView>();
@@ -16,9 +17,11 @@ public class Clickstream {
 
 		// Parse the data for each dataset.
 		try {
-			Scanner sc = new Scanner(new File("DataSet/featnames.csv"));
+			Scanner sc = new Scanner(new File("./DataSet/featnames.csv"));
+			int index = 0;
 			while(sc.hasNextLine()) {
-				featNames.add(sc.nextLine().trim());
+				//featNames.add(sc.nextLine().trim());
+				featNames[index] = sc.nextLine().trim();
 			}
 			sc.close();
 
@@ -75,10 +78,10 @@ public class Clickstream {
 	* Returns a DTreeNode that holds the attribute name, index and a set of branches to children.
 	* 
 	* @param pageViews Set of PageView Data to train from
-	* @param featNames Set of feature names correspoding to attributes
+	* @param featNames Array of feature names correspoding to attributes
 	* @return A DTreeNode containing the attribute split on and branches to any children
 	*/
-	public static DTreeNode learnTree(Set<PageView> pageViews, Set<String> featNames, Set<Integer> testAttr) {
+	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr) {
 		SplitData sd = getNextSplitAttribute(pageViews, testAttr);
 		
 		// TODO implement recursive tree building
@@ -132,10 +135,10 @@ public class Clickstream {
 	* Also writes to file the predicted value to be compared to actual output for accuracy.
 	*
 	* @param pageViews Set of PageView Data to train from
-	* @param featNames Set of feature names correspoding to attributes
+	* @param featNames Array of feature names correspoding to attributes
 	* @param root DTreeNode root for the decision tree built using the training data
 	*/
-	public static void predictTree(Set<PageView> pageViews, Set<String> featNames, DTreeNode root) {
+	public static void predictTree(Set<PageView> pageViews, String[] featNames, DTreeNode root) {
 		// TODO implement prediction on test data from tree
 		// Save results to file
 	}
