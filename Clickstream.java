@@ -82,8 +82,8 @@ public class Clickstream {
 		SplitData sd = getNextSplitAttribute(pageViews, testAttr);
 		
 		// TODO implement recursive tree building
-		if(chiSquare() < threshhold) {
-			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
+		if(chiSquare(sd)) {
+			return null;
 		} else if (positive == total) {
 			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
 		} else if (positive == 0) {
@@ -98,16 +98,33 @@ public class Clickstream {
 		}
 	}
 
-	public static int chiSquare() {
-		
+	public static boolean chiSquare(SplitData sd) {
+		return false;
 	}
 
 	public static int informationGain() {
-
+		
 	}
 
-	public static int entropy() {
+	/**
+	* Calculates the entropy of a given collection
+	*
+	* @param pageViews Collection to calculate entropy of.
+	* @return Returns a double reprenting the entropy value.
+	*/
+	public static double entropy(Set<PageView> pageViews) {
+		int pos = 0;
+		int tot = 0;
 
+		for(PageView p : pageViews) {
+			if(p.getLabel > 0) {
+				pos++;
+			}
+			tot++;
+		}
+		double pProp = (-1.0 * pos / tot) * Math.log(1.0 * pos / tot) / Math.log(2);
+		double nProp = (1.0 * (tot - pos) / tot) * Math.log(1.0 * (tot - pos) / tot) / Math.log(2);
+		return pProp - nProp;
 	}
 
 	/**
