@@ -80,6 +80,27 @@ public class Clickstream {
 	*/
 	public static DTreeNode learnTree(Set<PageView> pageViews, Set<String> featNames) {
 		// TODO implement recursive tree building
+		if(chiSquare() < threshhold) {
+			return new DTreeNode(attributeName, attributeIndex, null);
+		} else if (positive == total) {
+			return new DTreeNode(attributeName, attributeIndex, null);
+		} else if (positive == 0) {
+			return new DTreeNode(AttributeName, attributeIndex, null);
+		} else {
+			return learnTree(pageViews, featNames);
+		}
+	}
+
+	public static int chiSquare() {
+		
+	}
+
+	public static int informationGain() {
+
+	}
+
+	public static int entropy() {
+
 	}
 
 	/**
