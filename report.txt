@@ -1,0 +1,23 @@
+Sean Ventrella
+CSE 446/Assignment #1
+Question Responses
+
+**Code Description**
+
+
+**Section 1.5 Responses**
+1)
+	.05 - 
+	.01 - 
+	1.0 -
+
+	Observation:
+
+2) 
+	Options:
+
+3)
+	Path:
+
+**Section 2 Rule Induction**
+
