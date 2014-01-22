@@ -1,25 +1,31 @@
 import java.util.*;
 
 public class DTreeNode {
-	private String attribute_name;
-	private int attribute_index;
-	private Set<DTreeNode> branches;
+	private String attributeName;
+	private int attributeIndex;
+	private int label;
+	private Map<Integer, DTreeNode> branches;
 
-	public DTreeNode(attribute_name, attribute_index, branches) {
-		this.attribute_name = attribute_name;
-		this.attribute_index = attribute_index;
+	public DTreeNode(String attributeName, int attributeIndex, int label, Map<Integer, DTreeNode> branches) {
+		this.attributeName = attributeName;
+		this.attributeIndex = attributeIndex;
+		this.label = label;
 		this.branches = branches;
 	}
 
 	public String getName() {
-		return attribute_name;
+		return attributeName;
 	}
 
 	public int getIndex() {
-		return attribute_index;
+		return attributeIndex;
 	}
 
-	public Set<DTreeNode> getBranches {
+	public int getLabel() {
+		return label;
+	}
+
+	public Map<Integer, DTreeNode> getBranches {
 		return branches;
 	}
 }

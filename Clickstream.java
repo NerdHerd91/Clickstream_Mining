@@ -78,16 +78,23 @@ public class Clickstream {
 	* @param featNames Set of feature names correspoding to attributes
 	* @return A DTreeNode containing the attribute split on and branches to any children
 	*/
-	public static DTreeNode learnTree(Set<PageView> pageViews, Set<String> featNames) {
+	public static DTreeNode learnTree(Set<PageView> pageViews, Set<String> featNames, Set<Integer> testAttr) {
+		SplitData sd = getNextSplitAttribute(pageViews, testAttr);
+		
 		// TODO implement recursive tree building
 		if(chiSquare() < threshhold) {
-			return new DTreeNode(attributeName, attributeIndex, null);
+			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
 		} else if (positive == total) {
-			return new DTreeNode(attributeName, attributeIndex, null);
+			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
 		} else if (positive == 0) {
-			return new DTreeNode(AttributeName, attributeIndex, null);
+			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
 		} else {
-			return learnTree(pageViews, featNames);
+			DTreeNode node = new DTreeNode(sd.attributeName, sd.attirbuteIndex, new Map<Integer, DTreeNode>());
+
+			for(Integer value : sd.range) {
+				node.getBranches().put(value, learnTree(pageViews, featNames);
+			}
+			return node;
 		}
 	}
 
