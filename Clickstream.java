@@ -6,13 +6,13 @@ public class Clickstream {
 	public static final int FEATURES = 274;
 
 	public static void main(String[] args) {
-		// Set of String Feature Names
+		// Set of String Feature Names.
 		Set<String> featNames = new LinkedHashSet<String>();
-
-		// Maps from Class value (0 | 1) to a Set containing Map objects (from Feature Name to attribute value (0 | 1))
-		// Seperate maps for training data and test data
-		Map<Integer, Set<PageView>> trainFeat = new HashMap<Integer, Set<PageView>>();
-		Map<Integer, Set<PageView>> testFeat = new HashMap<Integer, Set<PageView>>();
+		
+		// Set of PageView objects for each feature set.
+		// Contains class value and array of feature values.
+		Set<PageView> trainFeat = new HashSet<PageView>();
+		Set<PageView> testFeat = new HashSet<PageView>();
 
 		try {
 			Scanner sc = new Scanner(new File("DataSet/featnames.csv"));
@@ -28,7 +28,7 @@ public class Clickstream {
 		}
 	}
 
-	public static void buildDataMaps(Map<Integer,Set<PageView>> dataMap, String featurePath, String labPath) {
+	public static void buildDataMaps(Set<PageView> pageViews, String featurePath, String labPath) {
 		try {
 			Scanner data = new Scanner(new File(featurePath));
 			Scanner labs = new Scanner(new File(labPath));
@@ -46,11 +46,7 @@ public class Clickstream {
 					index++;
 				}
 				
-				if(!dataMap.containsKey(label)) {
-					dataMap.put(label, new HashSet<PageView>());
-				}
-				PageView pv = new PageView(label, features);
-				dataMap.get(label).add(pv);
+				pageViews.add(new PageView(label, features));
 				sc.close();
 			}
 			data.close();
