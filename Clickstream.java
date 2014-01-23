@@ -110,6 +110,9 @@ public class Clickstream {
 				}
 			}
 			
+			if (attrIndex == -1) {
+				return null;
+			}
 			// Create node for attribute we choose to split on.
 			// Remove attribute from available list and retrieve map of possible values/subsets of PageView(s).
 			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, new HashMap<Integer, DTreeNode>());
@@ -118,7 +121,9 @@ public class Clickstream {
 			
 			// Recursive branching over all possible values for the attribute we are splitting on.
 			for (Integer value : range.keySet()) {
-				node.getBranches().put(value, learnTree(range.get(value), featNames, testAttr));
+				if (range.get(value).size() > 0) {
+					node.getBranches().put(value, learnTree(range.get(value), featNames, testAttr));
+				}
 			}
 			return node;
 		}
