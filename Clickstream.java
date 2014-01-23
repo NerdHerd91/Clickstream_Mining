@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.File;
+import java.io.PrintWriter;
 
 public class Clickstream {
 	
@@ -29,15 +30,20 @@ public class Clickstream {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		System.out.println("FInished parsing");
-		System.out.println(Arrays.toString(featNames));
 
 		// Build Decision Tree using training data
 		DTreeNode root = learnTree(trainFeat, featNames, new HashSet<Integer>());
-		System.out.println("Finished building Tree");
 
 		// Predict class for test data
-		// predictTree(testFeat, featNames, root);
+		try {
+			PrintWriter writer = new PrintWriter("clickstream_results.txt", "UTF-8");
+			for (PageView pageView : testFeat) {
+				writer.println(predictTree(pageView, root));
+			}
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -84,7 +90,6 @@ public class Clickstream {
 	* @return A DTreeNode containing the attribute split on and branches to any children
 	*/
 	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr) {
-		System.out.println("LEARNING");
 		int positive = 0;
 		for (PageView pageView : pageViews) {
 			if (pageView.getLabel() == 1) { positive++; }
@@ -94,12 +99,17 @@ public class Clickstream {
 			return new DTreeNode(1);
 		} else if (positive == 0) {
 			return new DTreeNode(0);
+		} else if(testAttr.size() == FEATURES) {
+			if (positive >= pageViews.size()) {
+				return new DTreeNode(1);
+			}
+			return new DTreeNode(0);
 		} else {
 			// TODO PERFORM CHI_SQUARE TEST
 			
 			// Compute the attribute containing the maximum information gain.
 			int attrIndex = -1;
-			double maxGain = 0;
+			double maxGain = -Double.MAX_VALUE;
 			for (int i = 0; i < FEATURES; i++) {
 				if (!testAttr.contains(i)) {
 					double gain = informationGain(pageViews, i);
@@ -110,9 +120,6 @@ public class Clickstream {
 				}
 			}
 			
-			if (attrIndex == -1) {
-				return null;
-			}
 			// Create node for attribute we choose to split on.
 			// Remove attribute from available list and retrieve map of possible values/subsets of PageView(s).
 			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, new HashMap<Integer, DTreeNode>());
@@ -123,6 +130,8 @@ public class Clickstream {
 			for (Integer value : range.keySet()) {
 				if (range.get(value).size() > 0) {
 					node.getBranches().put(value, learnTree(range.get(value), featNames, testAttr));
+				} else {
+					node.getBranches().put(value, new DTreeNode((positive >= pageViews.size()) ? 1 : 0));
 				}
 			}
 			return node;
@@ -202,8 +211,9 @@ public class Clickstream {
 	* @param featNames Array of feature names correspoding to attributes
 	* @param root DTreeNode root for the decision tree built using the training data
 	*/
-	public static void predictTree(Set<PageView> pageViews, String[] featNames, DTreeNode root) {
+	public static int predictTree(PageView pageView, DTreeNode root) {
 		// TODO implement prediction on test data from tree
 		// Save results to file
+		return 0;
 	}
 }
