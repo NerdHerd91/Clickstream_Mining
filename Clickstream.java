@@ -84,7 +84,7 @@ public class Clickstream {
 	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr) {
 		SplitData sd = getNextSplitAttribute(pageViews, testAttr);
 		
-		// TODO implement recursive tree building
+		// implement recursive tree building
 		if(chiSquare(sd)) {
 			return null;
 		} else if (positive == total) {
@@ -101,12 +101,43 @@ public class Clickstream {
 		}
 	}
 
+	/**
+	* Returns a boolean indicating we should no longer continue splitting.
+	*
+	* @param sd Object containing pertinent data for splitting on.
+	* @return Returns a boolean indicating Chi-Square result.
+	*/
 	public static boolean chiSquare(SplitData sd) {
 		return false;
 	}
 
-	public static int informationGain() {
+	/**
+	* Computes the information gain for a particular attribute to split on.
+	*
+	* @param pageViews Accepts a set of pageview objects.
+	* @param attributeIndex Represents the index of the attribute we wish to split on.
+	* @return Returns the information gain for this particular attribute split.
+	*/
+	public static int informationGain(Set<PageView> pageViews, int attributeIndex) {
+		double entropyS = entropy(pageViews);
+		double gain = 0;
+		Map<Integer, Set<PageView>> values = new Map<Integer, Set<PageView>>();
 		
+		// Create a map from all possible values to a Set of PageViews containing them.
+		for (PageView pageView : pageViews) {
+			value = pageView.getFeatures()[attributeIndex];
+			if (!values.containsKey(value) {
+				values.add(new Set<PageView>);
+			}
+			values.get(value).add(pageView);
+		}
+
+		// Sum the individual entropies * the weighted fraction for that particular subset.
+		for (Integer value : values.keySet()) {
+			gain += values.get(value).size() / ((double) pageViews.size()) * entropy(values.get(value));
+		}
+		
+		return gain;		
 	}
 
 	/**
