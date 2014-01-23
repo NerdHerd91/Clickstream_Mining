@@ -82,21 +82,32 @@ public class Clickstream {
 	* @return A DTreeNode containing the attribute split on and branches to any children
 	*/
 	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr) {
-		SplitData sd = getNextSplitAttribute(pageViews, testAttr);
-		
-		// implement recursive tree building
-		if(chiSquare(sd)) {
-			return null;
-		} else if (positive == total) {
+		int positive = 0;
+		for (PageView pageView : pageViews) {
+			if (pageView.getLabel == 1) { positive++; }
+		}
+
+		if (positive == pageViews.size()) {
 			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
 		} else if (positive == 0) {
 			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
 		} else {
-			DTreeNode node = new DTreeNode(sd.attributeName, sd.attirbuteIndex, new Map<Integer, DTreeNode>());
-
-			for(Integer value : sd.range) {
-				node.getBranches().put(value, learnTree(pageViews, featNames);
+			//DTreeNode node = new DTreeNode(sd.attributeName, sd.attirbuteIndex, new Map<Integer, DTreeNode>());
+			//for(Integer value : sd.range) {
+			//	node.getBranches().put(value, learnTree(pageViews, featNames);
+			//}
+			int attrIndex = -1;
+			int maxGain = 0;
+			for (int i = 0; i < FEATURES; i++) {
+				if (!testAttr.contains(i)) {
+					double gain = informationGain(pageViews, i);
+					if (maxGain < gain) {
+						maxGain = gain;
+						attrIndex = i;
+					}
+				}
 			}
+
 			return node;
 		}
 	}
@@ -118,7 +129,7 @@ public class Clickstream {
 	* @param attributeIndex Represents the index of the attribute we wish to split on.
 	* @return Returns the information gain for this particular attribute split.
 	*/
-	public static int informationGain(Set<PageView> pageViews, int attributeIndex) {
+	public static double informationGain(Set<PageView> pageViews, int attributeIndex) {
 		double entropyS = entropy(pageViews);
 		double gain = 0;
 		Map<Integer, Set<PageView>> values = new Map<Integer, Set<PageView>>();
@@ -136,7 +147,6 @@ public class Clickstream {
 		for (Integer value : values.keySet()) {
 			gain += values.get(value).size() / ((double) pageViews.size()) * entropy(values.get(value));
 		}
-		
 		return gain;		
 	}
 
@@ -147,14 +157,10 @@ public class Clickstream {
 	* @return Returns a double reprenting the entropy value.
 	*/
 	public static double entropy(Set<PageView> pageViews) {
+		int tot = pageViews.size();
 		int pos = 0;
-		int tot = 0;
-
 		for(PageView p : pageViews) {
-			if(p.getLabel > 0) {
-				pos++;
-			}
-			tot++;
+			if(p.getLabel > 0) { pos++; }
 		}
 		double pProp = (-1.0 * pos / tot) * Math.log(1.0 * pos / tot) / Math.log(2);
 		double nProp = (1.0 * (tot - pos) / tot) * Math.log(1.0 * (tot - pos) / tot) / Math.log(2);
