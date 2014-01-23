@@ -7,7 +7,6 @@ public class Clickstream {
 
 	public static void main(String[] args) {
 		// Array of String Feature Names.
-		//Set<String> featNames = new LinkedHashSet<String>();
 		String[] featNames = new String[FEATURES];
 
 		// Set of PageView objects for each feature set.
@@ -20,8 +19,8 @@ public class Clickstream {
 			Scanner sc = new Scanner(new File("./DataSet/featnames.csv"));
 			int index = 0;
 			while(sc.hasNextLine()) {
-				//featNames.add(sc.nextLine().trim());
 				featNames[index] = sc.nextLine().trim();
+				index++;
 			}
 			sc.close();
 
@@ -30,12 +29,15 @@ public class Clickstream {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+		System.out.println("FInished parsing");
+		System.out.println(Arrays.toString(featNames));
 
 		// Build Decision Tree using training data
-		DTreeNode root = learnTree(trainFeat, featNames);
+		DTreeNode root = learnTree(trainFeat, featNames, new HashSet<Integer>());
+		System.out.println("Finished building Tree");
 
 		// Predict class for test data
-		predictTree(testFeat, featNames, root);
+		// predictTree(testFeat, featNames, root);
 	}
 
 	/**
@@ -82,22 +84,22 @@ public class Clickstream {
 	* @return A DTreeNode containing the attribute split on and branches to any children
 	*/
 	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr) {
+		System.out.println("LEARNING");
 		int positive = 0;
 		for (PageView pageView : pageViews) {
-			if (pageView.getLabel == 1) { positive++; }
+			if (pageView.getLabel() == 1) { positive++; }
 		}
 
 		if (positive == pageViews.size()) {
-			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
+			return new DTreeNode(1);
 		} else if (positive == 0) {
-			return new DTreeNode(sd.attributeName, sd.attributeIndex, null);
+			return new DTreeNode(0);
 		} else {
-			//DTreeNode node = new DTreeNode(sd.attributeName, sd.attirbuteIndex, new Map<Integer, DTreeNode>());
-			//for(Integer value : sd.range) {
-			//	node.getBranches().put(value, learnTree(pageViews, featNames);
-			//}
+			// TODO PERFORM CHI_SQUARE TEST
+			
+			// Compute the attribute containing the maximum information gain.
 			int attrIndex = -1;
-			int maxGain = 0;
+			double maxGain = 0;
 			for (int i = 0; i < FEATURES; i++) {
 				if (!testAttr.contains(i)) {
 					double gain = informationGain(pageViews, i);
@@ -107,7 +109,17 @@ public class Clickstream {
 					}
 				}
 			}
-
+			
+			// Create node for attribute we choose to split on.
+			// Remove attribute from available list and retrieve map of possible values/subsets of PageView(s).
+			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, new HashMap<Integer, DTreeNode>());
+			testAttr.add(attrIndex);
+			Map<Integer, Set<PageView>> range = computeRange(pageViews, attrIndex);
+			
+			// Recursive branching over all possible values for the attribute we are splitting on.
+			for (Integer value : range.keySet()) {
+				node.getBranches().put(value, learnTree(range.get(value), featNames, testAttr));
+			}
 			return node;
 		}
 	}
@@ -132,22 +144,32 @@ public class Clickstream {
 	public static double informationGain(Set<PageView> pageViews, int attributeIndex) {
 		double entropyS = entropy(pageViews);
 		double gain = 0;
-		Map<Integer, Set<PageView>> values = new Map<Integer, Set<PageView>>();
+		Map<Integer, Set<PageView>> values = computeRange(pageViews, attributeIndex);
 		
-		// Create a map from all possible values to a Set of PageViews containing them.
-		for (PageView pageView : pageViews) {
-			value = pageView.getFeatures()[attributeIndex];
-			if (!values.containsKey(value) {
-				values.add(new Set<PageView>);
-			}
-			values.get(value).add(pageView);
-		}
-
 		// Sum the individual entropies * the weighted fraction for that particular subset.
 		for (Integer value : values.keySet()) {
 			gain += values.get(value).size() / ((double) pageViews.size()) * entropy(values.get(value));
 		}
 		return gain;		
+	}
+
+	/**
+	* Returns a Mapping of values to subsets of PageViews corresponding to each value.
+	*
+	* @param pageViews Current set of available examples.
+	* @param attributeIndex Index of the attribute we wish to split on.
+	* @return Returns a Map of integer to Set<PageView>.
+	*/
+	public static Map<Integer, Set<PageView>> computeRange(Set<PageView> pageViews, int attributeIndex) {
+		Map<Integer, Set<PageView>> values = new HashMap<Integer, Set<PageView>>();
+		for (PageView pageView : pageViews) {
+			int value = pageView.getFeatures()[attributeIndex];
+			if (!values.containsKey(value)) {
+				values.put(value, new HashSet<PageView>());
+			}
+			values.get(value).add(pageView);
+		}
+		return values;
 	}
 
 	/**
@@ -160,7 +182,7 @@ public class Clickstream {
 		int tot = pageViews.size();
 		int pos = 0;
 		for(PageView p : pageViews) {
-			if(p.getLabel > 0) { pos++; }
+			if(p.getLabel() > 0) { pos++; }
 		}
 		double pProp = (-1.0 * pos / tot) * Math.log(1.0 * pos / tot) / Math.log(2);
 		double nProp = (1.0 * (tot - pos) / tot) * Math.log(1.0 * (tot - pos) / tot) / Math.log(2);
