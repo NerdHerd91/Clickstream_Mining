@@ -4,11 +4,13 @@ public class DTreeNode {
 	private String attributeName;
 	private int attributeIndex;
 	private int label;
+	private int defaultLabel;
 	private Map<Integer, DTreeNode> branches;
 
-	public DTreeNode(String attributeName, int attributeIndex, Map<Integer, DTreeNode> branches) {
+	public DTreeNode(String attributeName, int attributeIndex, int defaultLabel, Map<Integer, DTreeNode> branches) {
 		this.attributeName = attributeName;
 		this.attributeIndex = attributeIndex;
+		this.defaultLabel = defaultLabel;
 		this.branches = branches;
 	}
 
@@ -27,6 +29,10 @@ public class DTreeNode {
 
 	public int getLabel() {
 		return this.label;
+	}
+
+	public int getDefaultLabel() {
+		return this.defaultLabel;
 	}
 
 	public Map<Integer, DTreeNode> getBranches() {

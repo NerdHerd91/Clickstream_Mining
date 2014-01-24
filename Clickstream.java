@@ -33,7 +33,8 @@ public class Clickstream {
 
 		// Build Decision Tree using training data
 		DTreeNode root = learnTree(trainFeat, featNames, new HashSet<Integer>());
-
+		System.out.println(root.getName());
+		System.out.println(root.getIndex());
 		// Predict class for test data
 		ArrayList<Integer> labels = new ArrayList<Integer>();
 		try {
@@ -145,20 +146,17 @@ public class Clickstream {
 					}
 				}
 			}
-		
+
 			// Create node for attribute we choose to split on.
 			// Remove attribute from available list and retrieve map of possible values/subsets of PageView(s).
-			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, new HashMap<Integer, DTreeNode>());
+			int defaultLabel = (positive >= pageViews.size() - positive) ? 1 : 0;
+			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, defaultLabel, new HashMap<Integer, DTreeNode>());
 			testAttr.add(attrIndex);
 			Map<Integer, Set<PageView>> range = computeRange(pageViews, attrIndex);
 			
 			// Recursive branching over all possible values for the attribute we are splitting on.
 			for (Integer value : range.keySet()) {
-				if (range.get(value).size() > 0) {
-					node.getBranches().put(value, learnTree(range.get(value), featNames, testAttr));
-				} else {
-					node.getBranches().put(value, new DTreeNode((positive >= pageViews.size() - positive) ? 1 : 0));
-				}
+				node.getBranches().put(value, learnTree(range.get(value), featNames, testAttr));
 			}
 			return node;
 		}
@@ -238,11 +236,13 @@ public class Clickstream {
 	* @return Returns the class value prediction
 	*/
 	public static int predictTree(PageView pageView, DTreeNode root) {
-		if (root == null) { return 1;}
 		if (root.getBranches() == null) {
 			return root.getLabel();
 		}
 		int value = pageView.getFeatures()[root.getIndex()];
+		if (root.getBranches().get(value) == null) {
+			return root.getDefaultLabel();
+		}
 		return predictTree(pageView, root.getBranches().get(value));
 	}
 }
