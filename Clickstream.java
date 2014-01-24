@@ -33,8 +33,7 @@ public class Clickstream {
 
 		// Build Decision Tree using training data
 		DTreeNode root = learnTree(trainFeat, featNames, new HashSet<Integer>());
-		System.out.println(root.getName());
-		System.out.println(root.getIndex());
+		
 		// Predict class for test data
 		ArrayList<Integer> labels = new ArrayList<Integer>();
 		try {
@@ -118,15 +117,19 @@ public class Clickstream {
 	*/
 	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr) {
 		int positive = 0;
+		System.out.println("SIZE: " + testAttr.size());
 		for (PageView pageView : pageViews) {
 			if (pageView.getLabel() == 1) { positive++; }
 		}
 
 		if (positive == pageViews.size()) {
+			System.out.println("ALL POSITIVE");
 			return new DTreeNode(1);
 		} else if (positive == 0) {
+			System.out.println("ALL NEGATIVE");
 			return new DTreeNode(0);
 		} else if (testAttr.size() == FEATURES) {
+			System.out.println("EITHER");
 			if (positive >= pageViews.size() - positive) {
 				return new DTreeNode(1);
 			}
@@ -153,10 +156,11 @@ public class Clickstream {
 			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, defaultLabel, new HashMap<Integer, DTreeNode>());
 			testAttr.add(attrIndex);
 			Map<Integer, Set<PageView>> range = computeRange(pageViews, attrIndex);
-			
+			System.out.println("RANGE SIZE = " + range.keySet());	
+
 			// Recursive branching over all possible values for the attribute we are splitting on.
 			for (Integer value : range.keySet()) {
-				node.getBranches().put(value, learnTree(range.get(value), featNames, testAttr));
+				node.getBranches().put(value, learnTree(range.get(value), featNames, new HashSet<Integer>(testAttr)));
 			}
 			return node;
 		}
@@ -220,7 +224,7 @@ public class Clickstream {
 		int tot = pageViews.size();
 		int pos = 0;
 		for (PageView p : pageViews) {
-			if (p.getLabel() > 0) { pos++; }
+			if (p.getLabel() == 1) { pos++; }
 		}
 		if (pos == 0 || pos == tot) { return 0; }
 		double pProp = (-1.0 * pos / tot) * Math.log(1.0 * pos / tot) / Math.log(2);
