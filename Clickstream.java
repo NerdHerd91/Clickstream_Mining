@@ -117,19 +117,15 @@ public class Clickstream {
 	*/
 	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr) {
 		int positive = 0;
-		System.out.println("SIZE: " + testAttr.size());
 		for (PageView pageView : pageViews) {
 			if (pageView.getLabel() == 1) { positive++; }
 		}
 
 		if (positive == pageViews.size()) {
-			System.out.println("ALL POSITIVE");
 			return new DTreeNode(1);
 		} else if (positive == 0) {
-			System.out.println("ALL NEGATIVE");
 			return new DTreeNode(0);
 		} else if (testAttr.size() == FEATURES) {
-			System.out.println("EITHER");
 			if (positive >= pageViews.size() - positive) {
 				return new DTreeNode(1);
 			}
@@ -156,7 +152,6 @@ public class Clickstream {
 			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, defaultLabel, new HashMap<Integer, DTreeNode>());
 			testAttr.add(attrIndex);
 			Map<Integer, Set<PageView>> range = computeRange(pageViews, attrIndex);
-			System.out.println("RANGE SIZE = " + range.keySet());	
 
 			// Recursive branching over all possible values for the attribute we are splitting on.
 			for (Integer value : range.keySet()) {
