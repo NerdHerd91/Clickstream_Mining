@@ -35,15 +35,36 @@ public class Clickstream {
 		DTreeNode root = learnTree(trainFeat, featNames, new HashSet<Integer>());
 
 		// Predict class for test data
+		ArrayList<Integer> labels = new ArrayList<Integer>();
 		try {
 			PrintWriter writer = new PrintWriter("clickstream_results.txt", "UTF-8");
 			for (PageView pageView : testFeat) {
-				writer.println(predictTree(pageView, root));
+				int label = predictTree(pageView, root);
+				labels.add(label);
+				writer.println(label);
 			}
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		// Calculate the Accuracy
+		int correct = computeAccuracy(testFeat, labels);
+		System.out.printf("Matches: %d\n", correct);
+		System.out.printf("Accuracy of Data: %.2f%%\n", 100.0 * correct / labels.size()); 
+	}
+
+	public static int computeAccuracy(Set<PageView> pageViews, ArrayList<Integer> labels) {
+		int correct = 0;
+		int index = 0;
+
+		for (PageView pageView : pageViews) {
+			if (pageView.getLabel() == labels.get(index)) {
+				correct++;
+			}
+			index++;
+		}
+		return correct;
 	}
 
 	/**
@@ -209,8 +230,8 @@ public class Clickstream {
 	* Also writes to file the predicted value to be compared to actual output for accuracy.
 	*
 	* @param pageViews Set of PageView Data to train from
-	* @param featNames Array of feature names correspoding to attributes
 	* @param root DTreeNode root for the decision tree built using the training data
+	* @return Returns the class value prediction
 	*/
 	public static int predictTree(PageView pageView, DTreeNode root) {
 		if (root == null) { return 1;}
