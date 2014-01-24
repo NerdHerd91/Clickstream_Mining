@@ -19,7 +19,7 @@ public class Clickstream {
 		try {
 			Scanner sc = new Scanner(new File("./DataSet/featnames.csv"));
 			int index = 0;
-			while(sc.hasNextLine()) {
+			while (sc.hasNextLine()) {
 				featNames[index] = sc.nextLine().trim();
 				index++;
 			}
@@ -48,23 +48,28 @@ public class Clickstream {
 			e.printStackTrace();
 		}
 
-		// Calculate the Accuracy
-		int correct = computeAccuracy(testFeat, labels);
-		System.out.printf("Matches: %d\n", correct);
-		System.out.printf("Accuracy of Data: %.2f%%\n", 100.0 * correct / labels.size()); 
+		// Calculate the accuracy for the test data
+		computeAccuracy(testFeat, labels);
 	}
-
-	public static int computeAccuracy(Set<PageView> pageViews, ArrayList<Integer> labels) {
+	
+	/**
+	* Computes how many predictions were correct against the test-data ouput,
+	* Prints to the console the number of matches and the overall percent accuracy.
+	*
+	* @param pageViews The set of test-data PageView objects
+	* @param labels An ArrayList containing the predicted output data
+	*/
+	public static void computeAccuracy(Set<PageView> pageViews, ArrayList<Integer> labels) {
 		int correct = 0;
 		int index = 0;
-
 		for (PageView pageView : pageViews) {
 			if (pageView.getLabel() == labels.get(index)) {
 				correct++;
 			}
 			index++;
 		}
-		return correct;
+		System.out.printf("Matches: %d\n", correct);
+		System.out.printf("Accuracy of Data: %.2f%%\n", 100.0 * correct / labels.size()); 
 	}
 
 	/**
@@ -80,7 +85,7 @@ public class Clickstream {
 			Scanner data = new Scanner(new File(featurePath));
 			Scanner labs = new Scanner(new File(labPath));
 
-			while(labs.hasNextInt() && data.hasNextLine()) {
+			while (labs.hasNextInt() && data.hasNextLine()) {
 				int label = labs.nextInt();
 				String dataLine = data.nextLine();
 				Scanner sc = new Scanner(dataLine);
@@ -88,7 +93,7 @@ public class Clickstream {
 				int[] features = new int[FEATURES];
 				int index = 0;
 
-				while(sc.hasNextInt()) {
+				while (sc.hasNextInt()) {
 					features[index] = sc.nextInt();
 					index++;
 				}
@@ -120,7 +125,7 @@ public class Clickstream {
 			return new DTreeNode(1);
 		} else if (positive == 0) {
 			return new DTreeNode(0);
-		} else if(testAttr.size() == FEATURES) {
+		} else if (testAttr.size() == FEATURES) {
 			if (positive >= pageViews.size() - positive) {
 				return new DTreeNode(1);
 			}
@@ -227,7 +232,6 @@ public class Clickstream {
 
 	/**
 	* Predicts the class values for a dataset of PageView objects,
-	* Also writes to file the predicted value to be compared to actual output for accuracy.
 	*
 	* @param pageViews Set of PageView Data to train from
 	* @param root DTreeNode root for the decision tree built using the training data
