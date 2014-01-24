@@ -100,7 +100,7 @@ public class Clickstream {
 		} else if (positive == 0) {
 			return new DTreeNode(0);
 		} else if(testAttr.size() == FEATURES) {
-			if (positive >= pageViews.size()) {
+			if (positive >= pageViews.size() - positive) {
 				return new DTreeNode(1);
 			}
 			return new DTreeNode(0);
@@ -119,7 +119,7 @@ public class Clickstream {
 					}
 				}
 			}
-			
+		
 			// Create node for attribute we choose to split on.
 			// Remove attribute from available list and retrieve map of possible values/subsets of PageView(s).
 			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, new HashMap<Integer, DTreeNode>());
@@ -131,7 +131,7 @@ public class Clickstream {
 				if (range.get(value).size() > 0) {
 					node.getBranches().put(value, learnTree(range.get(value), featNames, testAttr));
 				} else {
-					node.getBranches().put(value, new DTreeNode((positive >= pageViews.size()) ? 1 : 0));
+					node.getBranches().put(value, new DTreeNode((positive >= pageViews.size() - positive) ? 1 : 0));
 				}
 			}
 			return node;
@@ -164,7 +164,7 @@ public class Clickstream {
 		for (Integer value : values.keySet()) {
 			gain += values.get(value).size() / ((double) pageViews.size()) * entropy(values.get(value));
 		}
-		return gain;		
+		return entropyS - gain;		
 	}
 
 	/**
@@ -195,9 +195,10 @@ public class Clickstream {
 	public static double entropy(Set<PageView> pageViews) {
 		int tot = pageViews.size();
 		int pos = 0;
-		for(PageView p : pageViews) {
-			if(p.getLabel() > 0) { pos++; }
+		for (PageView p : pageViews) {
+			if (p.getLabel() > 0) { pos++; }
 		}
+		if (pos == 0 || pos == tot) { return 0; }
 		double pProp = (-1.0 * pos / tot) * Math.log(1.0 * pos / tot) / Math.log(2);
 		double nProp = (1.0 * (tot - pos) / tot) * Math.log(1.0 * (tot - pos) / tot) / Math.log(2);
 		return pProp - nProp;
@@ -212,8 +213,11 @@ public class Clickstream {
 	* @param root DTreeNode root for the decision tree built using the training data
 	*/
 	public static int predictTree(PageView pageView, DTreeNode root) {
-		// TODO implement prediction on test data from tree
-		// Save results to file
-		return 0;
+		if (root == null) { return 1;}
+		if (root.getBranches() == null) {
+			return root.getLabel();
+		}
+		int value = pageView.getFeatures()[root.getIndex()];
+		return predictTree(pageView, root.getBranches().get(value));
 	}
 }

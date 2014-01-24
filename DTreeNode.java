@@ -14,6 +14,7 @@ public class DTreeNode {
 
 	public DTreeNode(int label) {
 		this.label = label;
+		this.branches = null;
 	}
 
 	public String getName() {
