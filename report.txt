@@ -3,21 +3,131 @@ CSE 446/Assignment #1
 Question Responses
 
 **Code Description**
+	My code was written in Java.
+	----------------------------
 
+	(1) First the code parses the data for each dataset (training and test) into two
+		seperate Sets of PageView objects (contains label value and array of features.
+		Additionally we parse the feature name file into a string array for quick
+		lookup capability.
+		------------------------------------------------------------------------------
+		Next we build the decision tree on the training dataset. This is done by
+		calling the method "learnTree" which accepts a set of PageView objects, an
+		array of feature names, a set of used feature indices, and the threshhold 
+		value. The method starts by checking if we need to create a leaf node based on
+		the current set having all positives or all negatives or all features have 
+		been exhausted. 
+
+		If a leaf node was not created then we compute the attribute containing the
+		maximum information gain. We keep track of the attribute index to split on.
+		The information gain is calculated in a method "informationGain" which
+		uses the algorithm of Entropy(S) - sum of entropies for all feature values
+		to calculate and return the gain. The entropies are calculated by calling the 
+		method "entropy" which uses the equation in the textbook to properly
+		compute the entropy for a given set of examples.
+
+		Next we calculate the chi-square value to determine if we are under the 
+		passed in accepted threshhold value. This is calculate by calling the method
+		"chiSquare" which follows the algorithm stated in the specification document.
+
+		If we are still above the accepted threshhold then we create a new DTreeNode
+		and pass it the feature name we are splitting on, the feature index, the 
+		default label, and a new hashmap to store the branches in for each value the
+		feature can take on. Then for each possible value, we recursively call 
+		"learnTree" on it and add that subtree to our map as a branch.
+		-----------------------------------------------------------------------------
+		Once the tree has been constructed we can now run the test data on it to 
+		recieve predicitons on the output. Output is stored in a list and written to
+		a file for easy diff(ing). 
+
+		To predict we loop through each example in the test set and call the method
+		"predictTree" which traverses the tree based on the feature being checked
+		at each node of the tree until a leaf is found, at which point the label is
+		returned and written to the output file called "clickstream_results.txt".
+		
+		After all predictions have been made the program prints out the tree size and
+		calls "computeAccuracy" which calculates and prints to the console
+		the number of correct matches predicted along with the percent accuracy.
+		-----------------------------------------------------------------------------
+		USAGE NOTES:
+		When running be sure to increase the jvm heapspace size as this can be
+		necessary for how many branches are created depending on the threshhold.
+		Also pass in the command line aregument threshhold value or it will tell you
+		to enter it in an error message and cease executing as a check I put in.
+		Example Command Line:
+		--------------------
+		javac Clickstream.java
+		java -Xmx3072m Clickstream 0.01
 
 **Section 1.5 Responses**
 1)
-	.05 - 
-	.01 - 
-	1.0 -
+	.01 - Accuracy = 73.26% , Size = 459 nodes
+	.05 - Accuracy = 73.06% , Size = 948 nodes
+	1.0 - Accuracy = 65.17% , Size = 417644 nodes
 
-	Observation:
-
+	Observation: As we continue to restrict the threshhold, we improve our accuracy.
+				 This is a substantial gain in accuracy and reduction in node
+				 creation compared to the oversplitting we see when simply splitting
+				 as much as possible.
 2) 
-	Options:
+	Options: 
+	 	- Split stopping using chi-square is great for quickly improving accuracy 
+		  because it uses statistical analysis to determine whether the information 
+		  gain for a particular attribute that we may wish to split on is worth the
+		  effort. This not only helps prevent overfitting but also reduces the time
+		  and resources used when building the initial decision tree.
 
+		- Pruning (not implemented)
+		  is a good technique when you have lots of data to work with since
+		  it requires setting aside some of the training data to be used for 
+		  validation testing. This method has improved prediction accuracy becuase
+		  it allows us to remove nodes only when they do not improve our validation
+		  results, indicating that we are retaining as precise of a decision tree
+		  as possible. This method is slower due to the effort of still building
+		  a complete decision tree first but can certainly pay off in its accuracy
+		  gain for large datasets.
 3)
-	Path:
+	Path: "Session Request Count" -> "Num checkout Template Views" -> "US State"
+
+	This is one of the paths starting at the root, and this path makes sense because
+	we should clearly expect the session count to be a large number to split on and
+	then understanding how many people view the checkout page broken up by each state
+	seems like a relative indicator of whether someone is staying on the site. For 
+	instance, people in more rural areas are probably less likely to spend much time
+	shopping online because rural communities tend to be agricultural/environment based
+	where urban areas are probably likely to see larger population numbers indicating
+	increased consumers performin online transactions for goods.
+
+4) Extra Credit:
+	If I had 10-20 different p-values to choose from I would certainly pick the one
+	the gives the lowest testing error over the lowest training error. The reasoning
+	is that as you reduce the erro of training data, you quickly induce over-splitting
+	which although your training data predicitons look accurate, quickly results in
+	test datasets to be predicted poorly with decreasing accuracy. Therefore you want
+	to ensure that you choose a p-value that consistently results in the testing-data
+	having the lowest possible error since this is what you will use when making real
+	predicitons on large datasets. So you should choose choice (b).
 
 **Section 2 Rule Induction**
+	Number of Rules: The number of rules is equivalent to the number of nodes on a 
+					 balanced decision tree, therefore there wil be 2^(d-1) rules formed.
+	
+	Number of Preconditions: d preconditions per rule.
 
+	Number of distinct choices: d*2^(d-1) distinct choices. 
+
+	More Prone to Overfitting: Most datasets will contain a fair amount of noise, which
+							   affects the construction of fitting a hypothesis to the
+							   data, so we should see overfitting occur in each algorithm.
+							   That being said, a sequenctial covering algorithm such as
+							   CN2 overfitting seems less likely since a single rule only
+							   governs one hypothesis and is thus not related to the errors
+							   induced by other rules. This is different from a decision
+							   tree in the ID3 algorithm because every decision is a layer
+							   built from the parent node and so we see a greater degree of
+							   overfitting as we try to relate each prediction to the next
+							   going down the tree. Howeve there are many ways to reduce
+							   overfitting of a tree through Chi-Squared of forms of pruning
+							   so it is also likely that any good decision tree may have
+							   taken great measures to reduce the affects of overfitting, 
+							   possibly then performing more accurate than a ruleset.

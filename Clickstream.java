@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 public class Clickstream {
 	
 	public static final int FEATURES = 274;
+	public static int nodeCount = 0;
 
 	public static void main(String[] args) {
 		// Parse the pValue threshhold we will use.
@@ -60,6 +61,7 @@ public class Clickstream {
 		// Calculate the accuracy for the test data
 		System.out.println("Test-Data Prediciton Statistics");
 		System.out.println("-------------------------------");
+		System.out.printf("Tree size: %d\n", nodeCount);
 		computeAccuracy(testFeat, labels);
 	}
 	
@@ -127,6 +129,7 @@ public class Clickstream {
 	* @return A DTreeNode containing the attribute split on and branches to any children
 	*/
 	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr, double thresh) {
+		nodeCount++;
 		int positive = 0;
 		for (PageView pageView : pageViews) {
 			if (pageView.getLabel() == 1) { positive++; }
@@ -175,10 +178,12 @@ public class Clickstream {
 	}
 
 	/**
-	* Returns a boolean indicating we should no longer continue splitting.
+	* Returns a double to compare against the threshhold.
 	*
-	* @param sd Object containing pertinent data for splitting on.
-	* @return Returns a boolean indicating Chi-Square result.
+	* @param positive Total number of positives in the currect set to split on.
+	* @param total Total number of examples in the current set.
+	* @param range Map of attribute values to subset of examples for each.
+	* @return Returns a double indicating Chi-Square value to compare against.
 	*/
 	public static double chiSquare(int positive, int total, Map<Integer, Set<PageView>> range) {
 		double sum = 0;
