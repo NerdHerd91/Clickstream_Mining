@@ -7,6 +7,15 @@ public class Clickstream {
 	public static final int FEATURES = 274;
 
 	public static void main(String[] args) {
+		// Parse the pValue threshhold we will use.
+		double thresh = 1;
+		try {
+			thresh = Double.parseDouble(args[0]);
+		} catch (Exception e) {
+			System.out.println("Please be sure to include a valid threshhold.");
+			System.exit(0);
+		}
+
 		// Array of String Feature Names.
 		String[] featNames = new String[FEATURES];
 
@@ -32,7 +41,7 @@ public class Clickstream {
 		}
 
 		// Build Decision Tree using training data
-		DTreeNode root = learnTree(trainFeat, featNames, new HashSet<Integer>());
+		DTreeNode root = learnTree(trainFeat, featNames, new HashSet<Integer>(), thresh);
 		
 		// Predict class for test data
 		ArrayList<Integer> labels = new ArrayList<Integer>();
@@ -49,6 +58,8 @@ public class Clickstream {
 		}
 
 		// Calculate the accuracy for the test data
+		System.out.println("Test-Data Prediciton Statistics");
+		System.out.println("-------------------------------");
 		computeAccuracy(testFeat, labels);
 	}
 	
@@ -115,7 +126,7 @@ public class Clickstream {
 	* @param featNames Array of feature names correspoding to attributes
 	* @return A DTreeNode containing the attribute split on and branches to any children
 	*/
-	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr) {
+	public static DTreeNode learnTree(Set<PageView> pageViews, String[] featNames, Set<Integer> testAttr, double thresh) {
 		int positive = 0;
 		for (PageView pageView : pageViews) {
 			if (pageView.getLabel() == 1) { positive++; }
@@ -126,13 +137,8 @@ public class Clickstream {
 		} else if (positive == 0) {
 			return new DTreeNode(0);
 		} else if (testAttr.size() == FEATURES) {
-			if (positive >= pageViews.size() - positive) {
-				return new DTreeNode(1);
-			}
-			return new DTreeNode(0);
+			return (positive >= pageViews.size() - positive) ? new DTreeNode(1) : new DTreeNode(0);
 		} else {
-			// TODO PERFORM CHI_SQUARE TEST
-			
 			// Compute the attribute containing the maximum information gain.
 			int attrIndex = -1;
 			double maxGain = -Double.MAX_VALUE;
@@ -146,16 +152,23 @@ public class Clickstream {
 				}
 			}
 
+			// Retrieve map of possible values mapped to their subsets.
+			// Determine Chi-Square.
+			Map<Integer, Set<PageView>> range = computeRange(pageViews, attrIndex);
+			Chi chi = new Chi();
+			if (chiSquare(positive, pageViews.size(), range) < chi.critchi(thresh, range.keySet().size() - 1)) { 
+				return (positive >= pageViews.size() - positive) ? new DTreeNode(1) : new DTreeNode(0);
+			}
+
 			// Create node for attribute we choose to split on.
-			// Remove attribute from available list and retrieve map of possible values/subsets of PageView(s).
+			// Remove attribute from available list.
 			int defaultLabel = (positive >= pageViews.size() - positive) ? 1 : 0;
 			DTreeNode node = new DTreeNode(featNames[attrIndex], attrIndex, defaultLabel, new HashMap<Integer, DTreeNode>());
 			testAttr.add(attrIndex);
-			Map<Integer, Set<PageView>> range = computeRange(pageViews, attrIndex);
 
 			// Recursive branching over all possible values for the attribute we are splitting on.
 			for (Integer value : range.keySet()) {
-				node.getBranches().put(value, learnTree(range.get(value), featNames, new HashSet<Integer>(testAttr)));
+				node.getBranches().put(value, learnTree(range.get(value), featNames, new HashSet<Integer>(testAttr), thresh));
 			}
 			return node;
 		}
@@ -167,8 +180,18 @@ public class Clickstream {
 	* @param sd Object containing pertinent data for splitting on.
 	* @return Returns a boolean indicating Chi-Square result.
 	*/
-	public static boolean chiSquare(SplitData sd) {
-		return false;
+	public static double chiSquare(int positive, int total, Map<Integer, Set<PageView>> range) {
+		double sum = 0;
+		for (Integer value : range.keySet()) {
+			double pPrime = ((double) positive) * range.get(value).size() / total;
+			double nPrime = ((double) (total - positive)) * range.get(value).size() / total;
+			int pos = 0;
+			for (PageView pageView : range.get(value)) {
+				if ( pageView.getLabel() == 1) { pos++; }
+			}
+			sum += (Math.pow(pPrime - pos, 2) / pPrime) + (Math.pow(nPrime - (range.get(value).size() - pos), 2) / nPrime);
+		}
+		return sum;
 	}
 
 	/**
