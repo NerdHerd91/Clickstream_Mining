@@ -61,9 +61,9 @@ Question Responses
 
 **Section 1.5 Responses**
 1)
-	.01 - Accuracy = 73.26% , Size = 459 nodes
-	.05 - Accuracy = 73.06% , Size = 948 nodes
-	1.0 - Accuracy = 65.17% , Size = 417644 nodes
+	.01 - Accuracy = 73.26% , Size = 459 (nodes+leaves)
+	.05 - Accuracy = 73.06% , Size = 948 (nodes+leaves)
+	1.0 - Accuracy = 65.17% , Size = 417644 (nodes+leaves)
 
 	Observation: As we continue to restrict the threshhold, we improve our accuracy.
 				 This is a substantial gain in accuracy and reduction in node
