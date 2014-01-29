@@ -126,8 +126,8 @@ Question Responses
 							   tree in the ID3 algorithm because every decision is a layer
 							   built from the parent node and so we see a greater degree of
 							   overfitting as we try to relate each prediction to the next
-							   going down the tree. Howeve there are many ways to reduce
-							   overfitting of a tree through Chi-Squared of forms of pruning
+							   going down the tree. However there are many ways to reduce
+							   overfitting of a tree through Chi-Squared or forms of pruning
 							   so it is also likely that any good decision tree may have
 							   taken great measures to reduce the affects of overfitting, 
 							   possibly then performing more accurate than a ruleset.
