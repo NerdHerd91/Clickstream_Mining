@@ -119,15 +119,16 @@ Question Responses
 	More Prone to Overfitting: Most datasets will contain a fair amount of noise, which
 							   affects the construction of fitting a hypothesis to the
 							   data, so we should see overfitting occur in each algorithm.
-							   That being said, a sequenctial covering algorithm such as
-							   CN2 overfitting seems less likely since a single rule only
-							   governs one hypothesis and is thus not related to the errors
-							   induced by other rules. This is different from a decision
-							   tree in the ID3 algorithm because every decision is a layer
-							   built from the parent node and so we see a greater degree of
-							   overfitting as we try to relate each prediction to the next
-							   going down the tree. However there are many ways to reduce
-							   overfitting of a tree through Chi-Squared or forms of pruning
-							   so it is also likely that any good decision tree may have
-							   taken great measures to reduce the affects of overfitting, 
-							   possibly then performing more accurate than a ruleset.
+							   That being said, a sequential covering algorithm such as
+							   CN2 seems more likely to suffer from the affects of
+							   overfitting than a decision tree method such as ID3. The 
+							   reasoning behind this is that each rule in a ruleset only
+							   spans one hypothesis, and each rule can range from 1 to
+							   all possible attributes being combined. This means that a
+							   ruleset will exhaust all possible permutations of the 
+							   attributes. This varies from a decision tree in that
+							   each layer of a decision tree essentially locks in a 
+							   particular attribute, and therefore the number of permutations
+							   we generate is greatly reduced from all possible. Therefore,
+							   we are more likely to see rulesets suffer from a larger amount
+							   of overfitting as they try to precisely match each example.
