@@ -109,11 +109,11 @@ Question Responses
 	predicitons on large datasets. So you should choose choice (b).
 
 **Section 2 Rule Induction**
-	Number of Rules: (2^d)-1 rules.
+	Number of Rules: 2^(d-1) rules.
 	
 	Number of Preconditions: d preconditions per rule.
 
-	Number of distinct choices: d*((2^d)-1) distinct choices. 
+	Number of distinct choices: d*2^(d-1) distinct choices. 
 
 	More Prone to Overfitting: Most datasets will contain a fair amount of noise, which
 							   affects the construction of fitting a hypothesis to the
