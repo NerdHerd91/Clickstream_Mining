@@ -68,24 +68,22 @@ Question Responses
 	Observation: As we continue to restrict the threshhold, we improve our accuracy.
 				 This is a substantial gain in accuracy and reduction in node
 				 creation compared to the oversplitting we see when simply splitting
-				 as much as possible.
+				 as much as possible. Unfortunately this still is not as good as 
+				 simply choosing to predict 0 for every example in the set, which
+				 would give a roughly 74.8% accuracy.
 2) 
-	Options: 
-	 	- Split stopping using chi-square is great for quickly improving accuracy 
-		  because it uses statistical analysis to determine whether the information 
-		  gain for a particular attribute that we may wish to split on is worth the
-		  effort. This not only helps prevent overfitting but also reduces the time
-		  and resources used when building the initial decision tree.
+	Options
+		- Through our Chi-Squared split-stopping, the 0.05 and 0.01 threshhold values
+		  both substantially improved the predictive accuracy of our results. This
+		  makes sense because we are essentially computing whether the information
+		  gain from splitting is worth it to us. This helps by not overfitting the
+		  training data and instead allow more flexibility in our predictions for
+		  test data. THe split-stopping helps tp reduce the growth of our tree, 
+		  benefiting both the predictive accuracy and the total tree size, and
+		  increasing the Runtime of the overall algorithm. Using 0.01 still provided
+		  even more improvement over 0.05 threshhold, indicating that our tree
+		  still had room to improve on the degree of splitting.
 
-		- Pruning (not implemented)
-		  is a good technique when you have lots of data to work with since
-		  it requires setting aside some of the training data to be used for 
-		  validation testing. This method has improved prediction accuracy becuase
-		  it allows us to remove nodes only when they do not improve our validation
-		  results, indicating that we are retaining as precise of a decision tree
-		  as possible. This method is slower due to the effort of still building
-		  a complete decision tree first but can certainly pay off in its accuracy
-		  gain for large datasets.
 3)
 	Path: "Session Request Count" -> "Num checkout Template Views" -> "US State"
 
