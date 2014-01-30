@@ -128,6 +128,6 @@ Question Responses
 							   attributes. This varies from a decision tree in that
 							   each layer of a decision tree essentially locks in a 
 							   particular attribute, and therefore the number of permutations
-							   we generate is greatly reduced from all possible. Therefore,
-							   we are more likely to see rulesets suffer from a larger amount
-							   of overfitting as they try to precisely match each example.
+							   we generate is greatly reduced from all possible. Essentially
+							   we expect CN2 to create more rules for hypothesis than a
+							   decision tree will.
