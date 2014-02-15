@@ -159,7 +159,7 @@ public class Clickstream {
 			// Determine Chi-Square.
 			Map<Integer, Set<PageView>> range = computeRange(pageViews, attrIndex);
 			Chi chi = new Chi();
-			if (chiSquare(positive, pageViews.size(), range) < chi.critchi(thresh, range.keySet().size() - 1)) { 
+			if (chiSquare(positive, pageViews.size(), range) <= chi.critchi(thresh, range.keySet().size() - 1)) { 
 				return (positive >= pageViews.size() - positive) ? new DTreeNode(1) : new DTreeNode(0);
 			}
 
